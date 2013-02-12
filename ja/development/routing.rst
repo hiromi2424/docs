@@ -1,87 +1,89 @@
-Routing
-#######
+ルーティング(*Routing*)
+#######################
 
-Routing is a feature that maps URLs to controller actions. It was
-added to CakePHP to make pretty URLs more configurable and
-flexible. Using Apache’s mod\_rewrite is not required for using
-routes, but it will make your address bar look much more tidy.
+ルーティングは、URLをコントローラのアクションに結びつける(*map*)する機能です。
+これは、URLの見ばえをよくし(*pretty URL*)、より柔軟に設定できるように、
+CakePHPに備わっているものです。
+Apacheのmod\_rewriteが必ず必要というわけではありませんが、
+mod\_rewriteを使用すると、アドレスバーに表示されるURLが整ったものになります。
 
-Routing in CakePHP also encompasses the idea of reverse routing,
-where an array of parameters can be reversed into a string url.
-By using reverse routing, you can easily re-factor your applications
-url structure without having to update all your code.
+また、CakePHPのルーティングは、パラメータの配列を文字列のURLに戻すことができる、
+リバースルーティングの概念を含んでいます。
+リバースルーティングを用いることで、全てのコードを更新する必要なく、
+容易にアプリケーションのURL構造を再構築することができます。
 
 .. index:: routes.php
 
 .. _routes-configuration:
 
-Routes Configuration
-====================
+ルートの設定
+============
 
-Routes in an application are configured in ``app/Config/routes.php``.
-This file is included by the :php:class:`Dispatcher` when handling routes
-and allows you to define application specific routes you want used. Routes
-declared in this file are processed top to bottom when incoming requests
-are matched.  This means that the order you place routes can affect how
-routes are parsed.  It's generally a good idea to place most frequently
-visited routes at the top of the routes file if possible.  This will
-save having to check a number of routes that won't match on each request.
+アプリケーションのルート(*route*)の設定は ``app/Config/routes.php`` で行います。
+このファイルは :php:class:`Dispatcher` によってルートが処理される時に読み込まれ、
+望みのアプリケーション独自のルートを定義することができます。
+このファイルで定義されたルートは、要求されたリクエストがマッチするまで、
+上から下に順に処理されます。
+これはルートを配置する順番がルートがどう解析されるかに影響し得るということです。
+通常、出来る限りルートファイルの一番上に、最も頻繁にアクセスされるルートを
+置くようにすることが良い習慣となります。
+これは各々のリクエストで、マッチしない多くのルートをチェックする必要を省きます。
 
-Routes are parsed and matched in the order they are connected in.
-If you define two similar routes, the first defined route will
-have higher priority over the one defined latter.  After connecting routes you
-can manipulate the order of routes using :php:meth:`Router::promote()`.
+ルートは、定義された順序で解析とマッチングが成されます。
+二つの同様なルートを定義したとき、
+先に定義されたルートは後に定義されたものより高い優先順序を持ちます。
+ルートを定義した後で、 :php:meth:`Router::promote()`
+を用いてルートの順序を操作することができます。
 
-CakePHP also comes with a few default routes to get you started. These
-can be disabled later on once you are sure you don't need them.
-See :ref:`disabling-default-routes` on how to disable the default routing.
+またCakePHPには、すぐ使い始められるように、デフォルトのルートが付属しています。
+後にこれを必要としない時に、無効にすることができます。
+デフォルトのルーティングを無効化する手順は、 :ref:`disabling-default-routes`
+を見てください。
 
 
-Default Routing
-===============
+デフォルトのルーティング
+========================
 
-Before you learn about configuring your own routes, you should know
-that CakePHP comes configured with a default set of routes.
-CakePHP’s default routing will get you pretty far in any
-application. You can access an action directly via the URL by
-putting its name in the request. You can also pass parameters to
-your controller actions using the URL.::
+独自のルートを学ぶ前に、CakePHPのデフォルトのルートについて知っておく必要があります。
+CakePHPのデフォルトルーティングによって、
+どんなアプリケーションでもうまく動くようになっています。
+URLの中に、アクション名を置くことで、アクションに直接アクセスすることができます。
+URLを使うことでコントローラのアクションにパラメータを渡すこともできます。::
 
-        URL pattern default routes:
+        デフォルトのルートのURLパターン:
         http://example.com/controller/action/param1/param2/param3
 
-The URL /posts/view maps to the view() action of the
-PostsController, and /products/view\_clearance maps to the
-view\_clearance() action of the ProductsController. If no action is
-specified in the URL, the index() method is assumed.
+/posts/viewというURLは、PostsControllerのview()アクションにマップされます。
+/products/view\_clearanceは、
+ProductsControllerのview\_clearance()アクションにマップされます。
+URLでアクション名が指定されていない場合には、index()メソッドが用いられます。
 
-The default routing setup also allows you to pass parameters to
-your actions using the URL. A request for /posts/view/25 would be
-equivalent to calling view(25) on the PostsController, for
-example.  The default routing also provides routes for plugins,
-and prefix routes should you choose to use those features.
+デフォルトのルーティングでは、URLを使ってアクションにパラメータを渡すこともできます。
+例えば、/posts/view/25というリクエストは、
+PostsController 上でview(25)として呼ぶのと同じことになります。
+また、デフォルトのルーティングはプラグイン、
+プレフィックスのルートを、これらの機能の使用を選択した場合、提供します。
 
-The built-in routes live in ``Cake/Config/routes.php``.  You can
-disable the default routing by removing them from your application's
-:term:`routes.php` file.
+ビルトインのルートは ``Cake/Config/routes.php`` にあります。
+アプリケーションの :term:`routes.php` ファイルからこれを取り除くことで、
+デフォルトのルーティングを無効化できます。
 
 .. index:: :controller, :action, :plugin
 .. _connecting-routes:
 
-Connecting Routes
-=================
+ルートの定義
+============
 
-Defining your own routes allows you to define how your application
-will respond to a given URL. Define your own routes in the
-``app/Config/routes.php`` file using the :php:meth:`Router::connect()`
-method.
+自ルートの定義により、
+アプリケーションを指定したURLで動作させることができるようになります。
+独自のルーティングは、 ``app/Config/routes.php``
+ファイルで :php:meth:`Router::connect()` メソッドを使用して定義します。
 
-The ``connect()`` method takes up to three parameters: the URL you
-wish to match, the default values for your route elements, and
-regular expression rules to help the router match elements in the
-URL.
+``connect()`` メソッドは３つのパラメータからなっています。
+対応させたいURL、独自のルート要素のデフォルトの値、
+URLの要素と対応させるための正規表現ルールです。
 
-The basic format for a route definition is::
+ルート定義の基本的な形式は次のようになります。::
 
     Router::connect(
         'URL',
@@ -89,101 +91,105 @@ The basic format for a route definition is::
         array('option' => 'matchingRegex')
     );
 
-The first parameter is used to tell the router what sort of URL
-you're trying to control. The URL is a normal slash delimited
-string, but can also contain a wildcard (\*) or :ref:`route-elements`.
-Using a wildcard tells the router that you are willing to accept
-any additional arguments supplied. Routes without a \* only match
-the exact template pattern supplied.
+最初のパラメータで、制御するURLをルータに伝えます。
+URLは、通常のスラッシュで分けられた文字列です。
+しかし、ワイルドカード(\*)や、
+:ref:`route-elements` を含むことができます。
+ワイルドカードを使用すると、
+与えられたオプションパラメータ全てを認めるようにする、
+とルーターに伝えます。
+\*の無いルートは与えられたテンプレートパターンそのものにだけマッチします。
 
-Once you've specified a URL, you use the last two parameters of
-``connect()`` to tell CakePHP what to do with a request once it has
-been matched. The second parameter is an associative array. The
-keys of the array should be named after the route elements in the
-URL, or the default elements: ``:controller``, ``:action``, and ``:plugin``.
-The values in the array are the default values for those keys.
-Let's look at some basic examples before we start using the third
-parameter of connect()::
+URLを指定した後、 ``connect()`` の次の２つのパラメータを使って、
+リクエストが対応した場合に何を行うのかをCakePHPに伝えます。
+2番目のパラメータは連想配列です。
+配列のキーは、URLのルート要素にちなんだものか、
+デフォルト要素(``:controller`` 、 ``:action`` 、 ``:plugin``)にしてください。
+配列内の値は、それらのキーに対するデフォルト値です。
+connect()の3番目のパラメータを考える前に、基本的な例をいくつか見てみましょう。::
 
     Router::connect(
         '/pages/*',
         array('controller' => 'pages', 'action' => 'display')
     );
 
-This route is found in the routes.php file distributed with CakePHP.
-This route matches any URL starting with ``/pages/`` and
-hands it to the ``display()`` action of the ``PagesController();``
-The request /pages/products would be mapped to
-``PagesController->display('products')``.
+CakePHPのroutes.phpファイルの中に、このルートが書かれています。
+このルートは、 ``/pages/`` ではじまるすべてのURLにマッチし、
+それを ``PagesController();`` の ``display()`` アクションに渡します。
+例えば、/pages/productsというリクエストは、
+``PagesController->display('products')`` にマップされます。
 
-In addition to the greedy star ``/*`` there is also the ``/**`` trailing star
-syntax.  Using a trailing double star, will capture the remainder of a URL as a
-single passed argument.  This is useful when you want to use an argument that
-included a ``/`` in it::
+貪欲なアスタリスク(*greedy star*)と言える ``/*`` に加えて、
+``/**`` という後端アスタリスク(*trailing star*)記法もあります。
+後端に二重のアスタリスクを用いると、URLの残りの部分を単一の引数として捕捉します。
+これは ``/`` を含む引数を用いたい場合便利です。::
 
     Router::connect(
         '/pages/**',
         array('controller' => 'pages', 'action' => 'show')
     );
 
-The incoming URL of ``/pages/the-example-/-and-proof`` would result in a single
-passed argument of ``the-example-/-and-proof``.
+``/pages/the-example-/-and-proof`` というURLは、
+単一の引数として ``the-example-/-and-proof`` という結果になります。
 
 .. versionadded:: 2.1
 
-    The trailing double star was added in 2.1.
+    後端二重アスタリスクは2.1で追加されました。
 
-You can use the second parameter of :php:meth:`Router::connect()`
-to provide any routing parameters that are composed of the default values
-of the route::
+:php:meth:`Router::connect()` の二番目の引数を用いて、
+ルートのデフォルト値を作るルーティングパラメータを与えることができます。::
 
     Router::connect(
         '/government',
         array('controller' => 'pages', 'action' => 'display', 5)
     );
 
-This example shows how you can use the second parameter of
-``connect()`` to define default parameters. If you built a site
-that features products for different categories of customers, you
-might consider creating a route. This allows you link to
-``/government`` rather than ``/pages/display/5``.
+この2つ目の例は、 ``connect()``
+の2番目のパラメータでデフォルトパラメータを定義する方法を示しています。
+もし、種々のお客様向けに異なる製品がある場合などに、
+ルートを作成することを考えることができるでしょう。
+この例では、 ``/pages/display/5`` としなくても、
+``/government`` という URLでアクセスできるようになります。
 
 .. note::
 
-    Although you can connect alternate routes, the default routes
-    will continue to work.  This could create situations, where
-    content could end up with 2 urls. See :ref:`disabling-default-routes`
-    to disable default routes, and only provide the urls you define.
+    代替のルートを定義することができますが、
+    デフォルトのルートは引き続き機能します。
+    これはコンテンツが二つのURLになってしまうという状況を作り得ます。
+    デフォルトのルートを無効化し、自身で定義したURLのみを与えるには、
+    :ref:`disabling-default-routes` を見てください。
 
-Another common use for the Router is to define an "alias" for a
-controller. Let's say that instead of accessing our regular URL at
-``/users/some_action/5``, we'd like to be able to access it by
-``/cooks/some_action/5``. The following route easily takes care of
-that::
+他の一般的なルーターの使い方は、コントローラの別名(*alias*)を定義することです。
+通常の ``/users/some_action/5`` という URL の代わりに、
+``/cooks/some_action/5`` でアクセスさせたいとしましょう。
+このようなルートの設定は、次のようにすることで簡単に実現できます。::
 
     Router::connect(
         '/cooks/:action/*', array('controller' => 'users')
     );
 
-This is telling the Router that any url beginning with ``/cooks/``
-should be sent to the users controller.  The action called will
-depend on the value of the ``:action`` parameter.  By using
-:ref:`route-elements`, you can create variable routes, that accept
-user input or variables.  The above route also uses the greedy star.
-The greedy star indicates to :php:class:`Router` that this route
-should accept any additional positional arguments given.  These
-arguments will be made available in the :ref:`passed-arguments`
-array.
+この設定は、ルーターが ``/cooks/`` で始まるURLを、
+全てusersコントローラに送ることを表しています。
+呼ばれるアクションは ``:action`` パラメータの値に依存します。
+:ref:`route-elements` を使うことによって、
+ユーザー入力や変数を受け入れる様々なルートを作成できます。
+上記のルートは貪欲なアスタリスクも使っています。
+貪欲なアスタリスクは :php:class:`Router` に、
+このルートが与えられる追加の固定的(*positional*)
+なパラメータを受け入れるべきであることを指示します。
+これらの引数は :ref:`passed-arguments`
+配列で利用することができるようになります。
 
-When generating urls, routes are used too. Using
-``array('controller' => 'users', 'action' => 'some_action', 5)`` as
-a url will output /cooks/some_action/5 if the above route is the
-first match found.
+URLが生成されるときも、ルートの設定が適用されます。
+上述の例にあるルートが最初にマッチした場合、URL として
+``array('controller' => 'users', 'action' => 'some_action', 5)``
+のように指定すると、/cooks/someAction/5というURLが生成されます。
 
-If you are planning to use custom named arguments with your route,
-you have to make the router aware of it using the
-:php:meth:`Router::connectNamed()` function. So if you want the above route
-to match urls like ``/cooks/some_action/type:chef`` we do::
+ルートの中で独自の名前を持つパラメータを使うつもりならば、
+:php:meth:`Router::connectNamed()`
+を用いてルーターにそれを伝える必要があります。
+上述の例にあるルートに ``/cooks/some_action/type:chef``
+のようなURLをマッチさせたい場合は、次のようにします。::
 
     Router::connectNamed(array('type'));
     Router::connect(
@@ -192,21 +198,23 @@ to match urls like ``/cooks/some_action/type:chef`` we do::
 
 .. _route-elements:
 
-Route elements
---------------
+ルート要素
+----------
 
-You can specify your own route elements and doing so gives you the
-power to define places in the URL where parameters for controller
-actions should lie. When a request is made, the values for these
-route elements are found in ``$this->request->params`` on the controller.
-This is different than how named parameters are handled, so note the
-difference: named parameters (/controller/action/name:value) are
-found in ``$this->request->params['named']``, whereas custom route
-element data is found in ``$this->request->params``. When you define
-a custom route element, you can optionally specify a regular
-expression - this tells CakePHP how to know if the URL is correctly formed or not.
-If you choose to not provide a regular expression, any non ``/`` will be
-treated as part of the parameter::
+さらに柔軟な追加機能として、独自のルート要素を指定できます。
+この機能により、コントローラアクション用のパラメータが、
+URLのどこにあるのかを定義できるようになります。
+リクエストがあると、このルート要素は、
+コントローラの ``$this->request->params`` の中に入ります。
+これは、名前付きパラメータとは異なる扱いとなります。
+以下の違いに注意してください。
+名前付きパラメータ（/コントローラ/アクション/名前:値）は、
+``$this->request->params['named']`` に入りますが、ルート要素のデータは、
+``$this->request->params`` の中に入ります。
+独自のルート要素を定義する際には、任意で正規表現を指定することができます。
+これはURLが正しく作られているか、そうでないかをCakePHPが判断できるようにします。
+正規表現を使わない選択をとる場合、
+``/`` でない全てがパラメータの一部として扱われます。::
 
     Router::connect(
         '/:controller/:id',
@@ -214,35 +222,37 @@ treated as part of the parameter::
         array('id' => '[0-9]+')
     );
 
-This simple example illustrates how to create a quick way to view
-models from any controller by crafting a URL that looks like
-``/controllername/:id``. The URL provided to connect() specifies two
-route elements: ``:controller`` and ``:id``. The ``:controller`` element
-is a CakePHP default route element, so the router knows how to match and
-identify controller names in URLs. The ``:id`` element is a custom
-route element, and must be further clarified by specifying a
-matching regular expression in the third parameter of connect().
+これは、 ``/コントローラー名/:id`` という形で、
+どんなコントローラからでもモデルを表示(*view*)できるようにする簡素な例です。
+connect()に指定されているURLには２つのルート要素、
+``:controller`` と ``:id`` があります。
+``:controller`` 要素はCakePHPのデフォルトのルート要素なので、
+ルーターがURL内のコントローラ名をマッチし特定することができます。
+``:id`` 要素は独自のルート要素なので、
+connect()の３番目のパラメータ内の正規表現で、
+どうやってマッチさせるのかを明示する必要があります。
 
 .. note::
 
-    Patterns used for route elements must not contain any capturing
-    groups.  If they do, Router will not function correctly.
+    ルート要素に使われるパターンはグループキャプチャを含んではなりません。
+    これを含んでいると、ルーターは正しく動作しないでしょう。
 
-Once this route has been defined, requesting ``/apples/5`` is the same
-as requesting ``/apples/view/5``. Both would call the view() method of
-the ApplesController. Inside the view() method, you would need to
-access the passed ID at ``$this->request->params['id']``.
+この route が定義されると、 ``/apples/5`` というリクエストは、
+``/apples/view/5`` としたのと同じことになります。
+どちらも、ApplesControllerのview()メソッドを呼びます。
+view()メソッド内では、 ``$this->request->params['id']``
+を使って渡されたIDにアクセスする必要があることになるでしょう。
 
-If you have a single controller in your application and you do not want
-the controller name to appear in the url, you can map all urls to actions
-in your controller.  For example, to map all urls to actions of the
-``home`` controller, e.g have urls like ``/demo`` instead of
-``/home/demo``, you can do the following::
+もし、アプリケーション内でコントローラが1つだけで、
+コントローラ名をURL中に表示したくない場合、
+そのコントローラのアクションにURLをマッピングすることができます。
+例えば、 ``home`` コントローラのアクションにURLをマッピングする
+(URL を ``/home/demo`` の代わりに ``/demo`` にする)には、以下のようにします。::
 
     Router::connect('/:action', array('controller' => 'home'));
 
-If you would like to provide a case insensitive url, you can use regular
-expression inline modifiers::
+大文字小文字を考慮しないURLを提供したいなら、
+正規表現のインライン修飾子(*inline modifier*)を使うことができます。::
 
     Router::connect(
         '/:userShortcut',
@@ -250,7 +260,7 @@ expression inline modifiers::
         array('userShortcut' => '(?i:principal)')
     );
 
-One more example, and you'll be a routing pro::
+もうひとつ例をあげます。もうあなたはルーティングの達人でしょう::
 
     Router::connect(
         '/:controller/:year/:month/:day',
@@ -262,44 +272,44 @@ One more example, and you'll be a routing pro::
         )
     );
 
-This is rather involved, but shows how powerful routes can really
-become. The URL supplied has four route elements. The first is
-familiar to us: it's a default route element that tells CakePHP to
-expect a controller name.
+ややこしいものですが、ルートが非常に強力であることを示す例です。
+このURLでは、4つの要素があります。
+最初のものはよく知っているもので、
+コントローラ名が来ることをCakePHPに伝えるデフォルトのルート要素です。
 
-Next, we specify some default values. Regardless of the controller,
-we want the index() action to be called.
+次に、いくつかのデフォルト値を指定します。
+コントローラ名に関係なく、index()アクションが呼ばれるようにします。
 
-Finally, we specify some regular expressions that will match years,
-months and days in numerical form. Note that parenthesis (grouping)
-are not supported in the regular expressions. You can still specify
-alternates, as above, but not grouped with parenthesis.
+最後に、数値形式の年(*year*)、月(*month*)、日(*day*)
+にマッチする正規表現を指定します。
+ここで、この正規表現では括弧(グループ化)がサポートされてないことに注意してください。
+なお、上記のように、その他の正規表現を使うことはできますが、
+括弧でグループ化することはできません。
 
-Once defined, this route will match ``/articles/2007/02/01``,
-``/posts/2004/11/16``, handing the requests to
-the index() actions of their respective controllers, with the date
-parameters in ``$this->request->params``.
+このルートを設定すると、 ``/articles/2007/02/01`` 、 ``/posts/2004/11/16``
+等にマッチし、 ``$this->request->params`` に日付パラメータを伴って、
+対応するコントローラのindex()アクションにリクエストを処理します。
 
-There are several route elements that have special meaning in
-CakePHP, and should not be used unless you want the special meaning
+CakePHPでは特別な意味を持つルート要素がいくつかあり、
+その特別な意味を必要としないならこれらを使ってはいけません。
 
-* ``controller`` Used to name the controller for a route.
-* ``action`` Used to name the controller action for a route.
-* ``plugin`` Used to name the plugin a controller is located in.
-* ``prefix`` Used for :ref:`prefix-routing`
-* ``ext`` Used for :ref:`file-extensions` routing.
+* ``controller`` ルートのコントローラ名に使われます。
+* ``action`` ルートのコントローラアクション名に使われます。.
+* ``plugin`` コントローラが配置されているプラグイン名に使われます。
+* ``prefix`` :ref:`prefix-routing` に使われます。
+* ``ext`` :ref:`file-extensions` ルーティングに使われます。
 
-Passing parameters to action
+アクションにパラメータを渡す
 ----------------------------
 
-When connecting routes using :ref:`route-elements` you may want
-to have routed elements be passed arguments instead.  By using the 3rd
-argument of :php:meth:`Router::connect()` you can define which route
-elements should also be made available as passed arguments::
+:ref:`route-elements` を用いてルートを定義するとき、
+ルート要素を引数渡し(*passed arguments*)にしたいことがあるでしょう。
+:php:meth:`Router::connect()` の3番目の引数を用いて、
+どのルート要素が渡される引数として利用できるべきかも定義できます。::
 
     // SomeController.php
     public function view($articleId = null, $slug = null) {
-        // some code here...
+        // ここに何かしらコードを書く
     }
 
     // routes.php
@@ -307,18 +317,18 @@ elements should also be made available as passed arguments::
         '/blog/:id-:slug', // E.g. /blog/3-CakePHP_Rocks
         array('controller' => 'blog', 'action' => 'view'),
         array(
-            // order matters since this will simply map ":id" to $articleId in your action
+            // 上記のアクションで":id"を$articleIDにマッピングするため、順番は重要です。
             'pass' => array('id', 'slug'),
             'id' => '[0-9]+'
         )
     );
 
-And now, thanks to the reverse routing capabilities, you can pass
-in the url array like below and Cake will know how to form the URL
-as defined in the routes::
+これで今や、リバースルーティングの能力のおかげで、
+以下のようにURL配列に渡すことができます。ルートで定義されているので、
+CakeはURLをどのように作成したらよいかがわかっています。::
 
     // view.ctp
-    // this will return a link to /blog/3-CakePHP_Rocks
+    // これは /blog/3-CakePHP_Rocks へのリンクを返します
     echo $this->Html->link('CakePHP Rocks', array(
         'controller' => 'blog',
         'action' => 'view',
@@ -326,12 +336,13 @@ as defined in the routes::
         'slug' => 'CakePHP_Rocks'
     ));
 
-Per-route named parameters
---------------------------
+ルートごとの名前付きパラメータ
+------------------------------
 
-While you can control named parameters on a global scale using
-:php:meth:`Router::connectNamed()` you can also control named parameter
-behavior at the route level using the 3rd argument of ``Router::connect()``::
+:php:meth:`Router::connectNamed()`
+を用いてグローバル規模で名前付きパラメータを制御できる一方、
+``Router::connect()`` の3番目の引数を使って、
+ルートレベルで名前付きパラメータの挙動を制御することもできます。::
 
     Router::connect(
         '/:controller/:action/*',
@@ -346,115 +357,122 @@ behavior at the route level using the 3rd argument of ``Router::connect()``::
         )
     );
 
-The above route definition uses the ``named`` key to define how several named
-parameters should be treated.  Lets go through each of the various rules
-one-by-one:
+上記のルート定義は ``named`` キーを用いて、
+種々の名前付きパラメータがどう扱われるべきかを定義します。
+以下でいろいろなルールそれぞれを1つずつみていきましょう。
 
-* 'wibble' has no additional information.  This means it will always parse if
-  found in a url matching this route.
-* 'fish' has an array of conditions, containing the 'action' key.  This means
-  that fish will only be parsed as a named parameter if the action is also index.
-* 'fizz' also has an array of conditions.  However, it contains two controllers,
-  this means that 'fizz' will only be parsed if the controller matches one of the
-  names in the array.
-* 'buzz' has a string condition.  String conditions are treated as
-  regular expression fragments.  Only values for buzz matching the pattern will
-  be parsed.
+* 「wibble」は補足的な情報がありません。
+  このルートにマッチするURLにこれがあると、
+  常にパースされるということを意味します。
+* 「fish」は条件の配列で、「action」キーをもっています。
+  これはfishがアクションがindexのときのみ、
+  名前付きパラメータとしてパースされることを意味します。
+* 「fizz」も条件の配列を持っています。
+  しかしながら、これは二つのコントローラをもっています。
+  これは配列内の名前のうち一つにコントローラがマッチしたときのみ、
+  「fizz」がパースされることを意味します。
+* 「buzz」は文字列条件をもっています。
+  文字列条件は正規表現の一部として扱われます。
+  パターンにマッチしたbuzzの値のみパースされます。
 
-If a named parameter is used and it does not match the provided criteria, it will
-be treated as a passed argument instead of a named parameter.
+名前付きパラメータが使用されていて、与えられた条件に適合しない場合、
+名前付きパラメータの代わりに引数渡しとして扱われます。
 
 .. index:: admin routing, prefix routing
 .. _prefix-routing:
 
-Prefix Routing
---------------
+プレフィックスル－ティング(*Prefix Routing*)
+--------------------------------------------
 
-Many applications require an administration section where
-privileged users can make changes. This is often done through a
-special URL such as ``/admin/users/edit/5``. In CakePHP, prefix routing
-can be enabled from within the core configuration file by setting
-the prefixes with Routing.prefixes. Note that prefixes, although
-related to the router, are to be configured in
-``app/Config/core.php``::
+たいていのアプリケーションには、
+権限のあるユーザだけが情報を変更できる管理画面が必要です。
+そのために ``/admin/users/edit/5``
+のような特別なURLを準備することがよくあります。
+CakePHPでは、コア設定ファイル内のRouting.prefixesにプレフィックスを設定することで、
+プレフィックスルーティングを有効にできます。
+また、プレフィックスはルータに関連しますが、 ``app/Config/core.php``
+で設定することに留意してください。::
 
     Configure::write('Routing.prefixes', array('admin'));
 
-In your controller, any action with an ``admin_`` prefix will be
-called. Using our users example, accessing the url
-``/admin/users/edit/5`` would call the method ``admin_edit`` of our
-``UsersController`` passing 5 as the first parameter. The view file
-used would be ``app/View/Users/admin_edit.ctp``
+コントローラ(controller)内では、プレフィックスとして ``admin_``
+をメソッドの前につけたすべてのアクションが呼び出されます。
+usersを例にすると、 ``/admin/users/edit/5`` というURLへのアクセスで、
+``UsersController`` の ``admin_edit`` メソッドが、引数5で呼び出されます。
+ビューファイルは ``app/View/Users/admin_edit.ctp`` となります。
 
-You can map the url /admin to your ``admin_index`` action of pages
-controller using following route::
+/adminというURLを、pagesコントローラの ``admin_index``
+アクションにマップするには次のようなルートを使います。::
 
     Router::connect('/admin', array('controller' => 'pages', 'action' => 'index', 'admin' => true));
 
-You can configure the Router to use multiple prefixes too. By
-adding additional values to ``Routing.prefixes``. If you set::
+``Routing.prefixes`` に値を追加することによって、
+複数のプレフィックスを使うようにルーターを設定することもできます。もし、::
 
     Configure::write('Routing.prefixes', array('admin', 'manager'));
 
-Cake will automatically generate routes for both the admin and
-manager prefixes. Each configured prefix will have the following
-routes generated for it::
+と設定すると、Cakeはadminとmanagerの両方のプレフィックスに対するルートを自動的に生成します。
+各々の設定されたプレフィックスのために、以下のルートが生成されるでしょう。::
 
     Router::connect("/{$prefix}/:plugin/:controller", array('action' => 'index', 'prefix' => $prefix, $prefix => true));
     Router::connect("/{$prefix}/:plugin/:controller/:action/*", array('prefix' => $prefix, $prefix => true));
     Router::connect("/{$prefix}/:controller", array('action' => 'index', 'prefix' => $prefix, $prefix => true));
     Router::connect("/{$prefix}/:controller/:action/*", array('prefix' => $prefix, $prefix => true));
 
-Much like admin routing all prefix actions should be prefixed with
-the prefix name. So ``/manager/posts/add`` would map to
-``PostsController::manager_add()``.
+adminルーティングのように、
+全てのプレフィックス付きアクションはプレフィックス名を接頭辞としてつけるべきです。
+``/manager/posts/add`` が ``PostsController::manager_add()``
+にマッピングされるからです。
 
-Additionally, the current prefix will be available from the controller methods through ``$this->request->prefix``
+加えて、現在のプレフィックスはコントローラのメソッドから
+``$this->request->prefix`` を通して取得できます。
 
-When using prefix routes it's important to remember, using the HTML
-helper to build your links will help maintain the prefix calls.
-Here's how to build this link using the HTML helper::
+プレフィックスルートを使うときに重要な点は、
+HTMLヘルパーを使用してリンクを作成するなら、
+プレフィックスを用いた呼び出しの管理も楽になるということです。
+HTMLヘルパーを使ったリンクの例は次のようになります。::
 
-    // Go into a prefixed route.
+    // プレフィックスがつけられたルートに行く
     echo $this->Html->link('Manage posts', array('manager' => true, 'controller' => 'posts', 'action' => 'add'));
 
-    // leave a prefix
+    // プレフィックスとお別れする
     echo $this->Html->link('View Post', array('manager' => false, 'controller' => 'posts', 'action' => 'view', 5));
 
 .. index:: plugin routing
 
-Plugin routing
---------------
+プラグインルーティング
+----------------------
 
-Plugin routing uses the **plugin** key. You can create links that
-point to a plugin, but adding the plugin key to your url array::
+プラグインルーティングは **plugin** キーを使います。
+プラグインを示すリンクを作ることができますが、
+pluginキーをURL配列に追加してください。::
 
     echo $this->Html->link('New todo', array('plugin' => 'todo', 'controller' => 'todo_items', 'action' => 'create'));
 
-Conversely if the active request is a plugin request and you want
-to create a link that has no plugin you can do the following::
+逆に、進行中のリクエストがプラグインのリクエストで、
+プラグイン無しのリンクを生成したいときは、以下のようにできます。::
 
     echo $this->Html->link('New todo', array('plugin' => null, 'controller' => 'users', 'action' => 'profile'));
 
-By setting ``plugin => null`` you tell the Router that you want to
-create a link that is not part of a plugin.
+``plugin => null`` と設定することによって、
+ルータに作りたいリンクがプラグインの一部ではないということを伝えることができます。
 
 .. index:: file extensions
 .. _file-extensions:
 
-File extensions
----------------
+ファイル拡張子
+--------------
 
-To handle different file extensions with your routes, you need one
-extra line in your routes config file::
+ルートで異なるファイル拡張子を扱う場合は、
+ルート設定ファイルに特別な1行が必要です。::
 
     Router::parseExtensions('html', 'rss');
 
-This will tell the router to remove any matching file extensions,
-and then parse what remains.
+これは全てのマッチするファイル拡張子を削除して、
+残りの部分を解析するようにルータに指示します。
 
-If you want to create a URL such as /page/title-of-page.html you
-would create your route as illustrated below::
+もし/page/title-of-page.htmlのようなURLを作りたいのなら、
+以下に例示するようなルートを作ることになります。::
 
     Router::connect(
         '/page/:title',
@@ -464,16 +482,17 @@ would create your route as illustrated below::
         )
     );
 
-Then to create links which map back to the routes simply use::
+そして、ルートに遡って合致するリンクを作成するには、
+単純にに次のようにします。::
 
     $this->Html->link(
         'Link title',
         array('controller' => 'pages', 'action' => 'view', 'title' => 'super-article', 'ext' => 'html')
     );
 
-File extensions are used by :php:class:`RequestHandlerComponent` to do automatic
-view switching based on content types.  See the RequestHandlerComponent for
-more information.
+ファイル拡張子は、 :php:class:`RequestHandlerComponent` によって、
+コンテンツの種類に基づいて自動的にビューの切り替えをするのに使用されます。
+詳しい情報はRequestHandlerComponentの章を見てください。
 
 .. _route-conditions:
 
