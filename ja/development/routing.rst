@@ -613,50 +613,49 @@ PostsControllerのview()アクションが呼ばれます。
 
     名前付きパラメータとして解析されるものは、
     :php:meth:`Router::connectNamed()` によって制御されます。
-    What is parsed as a named parameter is controlled by
-    :php:meth:`Router::connectNamed()`.  If your named parameters are not
-    reverse routing, or parsing correctly, you will need to inform
-    :php:class:`Router` about them.
+    名前付きパラメータがリバースルーティングされない、
+    もしくは正しくパースされない場合は、 :php:class:`Router`
+    にその名前付きパラメータのことを知らせる必要があります。
 
-Some summarizing examples for default routes might prove helpful::
+以下のデフォルトルートによる要約例が参考になることでしょう::
 
-    URL to controller action mapping using default routes:
+    デフォルトのルーティングを使用した、
+    URLからコントローラアクションへのマッピング:
 
     URL: /monkeys/jump
-    Mapping: MonkeysController->jump();
+    マッピング: MonkeysController->jump();
 
     URL: /products
-    Mapping: ProductsController->index();
+    マッピング: ProductsController->index();
 
     URL: /tasks/view/45
-    Mapping: TasksController->view(45);
+    マッピング: TasksController->view(45);
 
     URL: /donations/view/recent/2001
-    Mapping: DonationsController->view('recent', '2001');
+    マッピング: DonationsController->view('recent', '2001');
 
     URL: /contents/view/chapter:models/section:associations
-    Mapping: ContentsController->view();
+    マッピング: ContentsController->view();
     $this->passedArgs['chapter'] = 'models';
     $this->passedArgs['section'] = 'associations';
     $this->params['named']['chapter'] = 'models';
     $this->params['named']['section'] = 'associations';
 
-When making custom routes, a common pitfall is that using named
-parameters will break your custom routes. In order to solve this
-you should inform the Router about which parameters are intended to
-be named parameters. Without this knowledge the Router is unable to
-determine whether named parameters are intended to actually be
-named parameters or routed parameters, and defaults to assuming you
-intended them to be routed parameters. To connect named parameters
-in the router use :php:meth:`Router::connectNamed()`::
+カスタムルートを作るときによくある落とし穴は、
+名前付きパラメータがカスタムルートを破壊してしまうことです。
+これを解決するためには、ルータにどのパラメータを名前付きパラメータにするつもりかを通知しなくてはなりません。
+ルータはこれを知らないと、名前付きパラメータが実際に名前付きパラメータとして意図されているのか、
+ルーティングされるパラメータとして意図されているのかを決定することができません。
+また、デフォルトではルーティングされるパラメータとして意図されていると決めてかかることになります。
+ルータで名前付きパラメータに接続するためには、
+:php:meth:`Router::connectNamed()` を使用してください。::
 
     Router::connectNamed(array('chapter', 'section'));
 
-Will ensure that your chapter and section parameters reverse route
-correctly.
+とすると、chapterパラメータとsectionパラメータが正しくリバースルーティングできるようになります。
 
-When generating urls, using a :term:`routing array` you add named
-parameters as values with string keys matching the name::
+:term:`routing array` を使ったURLの生成時、
+名前に一致する文字列のキーの値として名前付きパラメータを追加します。::
 
     array('controller' => 'posts', 'action' => 'view', 'chapter' => 'association')
 
