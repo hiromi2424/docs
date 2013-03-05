@@ -496,22 +496,24 @@ pluginキーをURL配列に追加してください。::
 
 .. _route-conditions:
 
-Using additional conditions when matching routes
-------------------------------------------------
+ルートのマッチング時の補助的な条件の使用
+----------------------------------------
 
-When creating routes you might want to restrict certain URL's based on specific
-request/environment settings. A good example of this is :doc:`rest`
-routing. You can specify additional conditions in the ``$defaults`` argument for
-:php:meth:`Router::connect()`.  By default CakePHP exposes 3 environment
-conditions, but you can add more using :ref:`custom-route-classes`. The built-in
-options are:
+ルートを作成するとき、
+一定のURLを特定のリクエスト・環境設定の元に制限したい場合があるでしょう。
+この良い例として、 :doc:`rest` ルーティングがあります。
+:php:meth:`Router::connect()` の ``$defaults``
+引数で補足的な条件を指定することができます。
+CakePHPはデフォルトで3つの環境条件を公開していますが、
+:ref:`custom-route-classes` を使って更に追加することができます。
+ビルトインのオプションは以下の通りです。
 
-- ``[type]`` Only match requests for specific content types.
-- ``[method]`` Only match requests with specific HTTP verbs.
-- ``[server]`` Only match when $_SERVER['SERVER_NAME'] matches the given value.
+- ``[type]`` 特定のコンテンツの種類(*content type*)のリクエストのみにマッチします。
+- ``[method]`` 特定のHTTP動詞(*verbs*)を伴うリクエストのみにマッチします。
+- ``[server]`` $_SERVER['SERVER_NAME'] が与えられた値にマッチする時のみマッチします。
 
-We'll provide a simple example here of how you can use the ``[method]``
-option to create a custom RESTful route::
+``[method]`` オプションを使い独自のレストフルなルートを作成する方法の、
+簡単な例をここに示します。::
 
     Router::connect(
         "/:controller/:id",
@@ -519,32 +521,33 @@ option to create a custom RESTful route::
         array("id" => "[0-9]+")
     );
 
-The above route will only match for ``PUT`` requests. Using these conditions,
-you can create custom REST routing, or other request data dependent information.
+上記のルートは ``PUT`` リクエストのみにマッチします。
+これらの条件を用いて、独自のRESTルーティングや、
+その他のリクエストデータに依存する情報を作成することができます。
 
 .. index:: passed arguments
 .. _passed-arguments:
 
-Passed arguments
-================
+passed引数
+==========
 
-Passed arguments are additional arguments or path segments that are
-used when making a request. They are often used to pass parameters
-to your controller methods.::
+passed引数はリクエストを作り上げるときに、
+その他の引数またはパスセグメントとして使用されます。
+これらはコントローラのメソッドにパラメータを渡すためによく使われます。::
 
     http://localhost/calendars/view/recent/mark
 
-In the above example, both ``recent`` and ``mark`` are passed
-arguments to ``CalendarsController::view()``. Passed arguments are
-given to your controllers in three ways. First as arguments to the
-action method called, and secondly they are available in
-``$this->request->params['pass']`` as a numerically indexed array. Lastly
-there is ``$this->passedArgs`` available in the same way as the
-second one. When using custom routes you can force particular
-parameters to go into the passed arguments as well.
+上記の例では、 ``recent`` と ``mark`` は
+``CalendarsController::view()`` へのpassed引数です。
+passed引数は三つの方法でコントローラに渡されます。
+一つは、アクションのメソッドが呼び出されたときの引数としてです。
+二つ目は、順番付けされた配列として
+``$this->request->params['pass']`` を利用できます。
+最後は二つ目と同じ方法で ``$this->passedArgs`` が利用できます。
+また、カスタムルートを使うとき、
+passed引数に特定のパラメータを入れさせることもできます。
 
-If you were to visit the previously mentioned url, and you
-had a controller action that looked like::
+以下の様なコントローラ・アクションをもち、前述のURLを参照した場合、::
 
     CalendarsController extends AppController {
         public function view($arg1, $arg2) {
@@ -552,7 +555,7 @@ had a controller action that looked like::
         }
     }
 
-You would get the following output::
+以下の出力を得ることでしょう::
 
     Array
     (
@@ -560,15 +563,15 @@ You would get the following output::
         [1] => mark
     )
 
-This same data is also available at ``$this->request->params['pass']``
-and ``$this->passedArgs`` in your controllers, views, and helpers.
-The values in the pass array are numerically indexed based on the
-order they appear in the called url::
+これと同じデータを コントローラ、ビュー、ヘルパーの
+``$this->request->params['pass']`` と ``$this->passedArgs``
+でも利用できます。
+pass配列の値は呼ばれたURLに現れる順番を元に数値添字で配置されます。::
 
     debug($this->request->params['pass']);
     debug($this->passedArgs);
 
-Either of the above would output::
+上記のどちらも以下の出力をします::
 
     Array
     (
@@ -578,34 +581,38 @@ Either of the above would output::
 
 .. note::
 
-    $this->passedArgs may also contain named parameters as a named
-    array mixed with Passed arguments.
+    $this->passedArgsには、名前付き引数が連想配列として、
+    passed引数と混ぜられて含まれていることがあります。
 
-When generating urls, using a :term:`routing array` you add passed
-arguments as values without string keys in the array::
+:term:`routing array` を使ったURLの生成時、
+配列に文字列キー無しの値としてpassed引数を与えます。::
 
     array('controller' => 'posts', 'action' => 'view', 5)
 
-Since ``5`` has a numeric key, it is treated as a passed argument.
+``5`` は数値キーをもつので、passed引数として扱われます。
 
 .. index:: named parameters
 
 .. _named-parameters:
 
-Named parameters
-================
+名前付きパラメータ
+==================
 
-You can name parameters and send their values using the URL. A
-request for ``/posts/view/title:first/category:general`` would result
-in a call to the view() action of the PostsController. In that
-action, you’d find the values of the title and category parameters
-inside ``$this->params['named']``.  They are also available inside
-``$this->passedArgs``. In both cases you can access named parameters using their
-name as an index.  If named parameters are omitted, they will not be set.
+URLを使ってパラメータに名前を付けて、その値を渡すことができます。
+``/posts/view/title:first/category:general`` というリクエストでは、
+PostsControllerのview()アクションが呼ばれます。
+このアクションでは、titleとcategoryというパラメータの値を、
+``$this->params['named']`` の中に見つけることができます。
+また、 ``$this->passedArgs`` の中でも利用することができます。
+どちらの方法でも、その名前をインデックスとして使って、
+名前付きパラメータにアクセスすることができます。
+名前付きパラメータが省略された場合はセットされません。
 
 
 .. note::
 
+    名前付きパラメータとして解析されるものは、
+    :php:meth:`Router::connectNamed()` によって制御されます。
     What is parsed as a named parameter is controlled by
     :php:meth:`Router::connectNamed()`.  If your named parameters are not
     reverse routing, or parsing correctly, you will need to inform
