@@ -659,19 +659,18 @@ PostsControllerのview()アクションが呼ばれます。
 
     array('controller' => 'posts', 'action' => 'view', 'chapter' => 'association')
 
-Since 'chapter' doesn't match any defined route elements, it's treated
-as a named parameter.
+「chapter」が定義されたルート要素のどれとも一致しないことから、
+これは名前付きパラメータとして扱われます。
 
 .. note::
 
-    Both named parameters and route elements share the same key-space.
-    It's best to avoid re-using a key for both a route element and a named
-    parameter.
+    名前付きパラメータとルート要素は同じキー空間を共有します。
+    ルート要素と名前付きパラメータ、
+    両方にキーを再利用することを避けることが最善となります。
 
-Named parameters also support using arrays to generate and parse
-urls.  The syntax works very similar to the array syntax used
-for GET parameters.  When generating urls you can use the following
-syntax::
+名前付きパラメータは、URLを生成・解析するのに配列の利用をサポートしています。
+その記法はGETパラメータに使われる配列記法と非常によく似た動きをします。
+URLを生成する時には、以下の書き方が使えます。::
 
     $url = Router::url(array(
         'controller' => 'posts',
